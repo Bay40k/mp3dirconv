@@ -1,5 +1,11 @@
 import os, os.path
 
+#TODO
+#command line args
+#multithreading
+#error handling
+#a lot
+
 EXT = ".m4a" #extension to convert
 DIR = "." #directory to convert
 OUT_DIR = "./output" #output directory
