@@ -10,7 +10,8 @@ from typing import List, Optional
 
 """
 Usage:
-mp3dirconv.py <input folder> <output folder>
+mp3dirconv.py [options] <input folder> <output folder>
+--file <input file> | Use list of paths from a file, and uses input folder as root reference for output subfolders
 """
 
 EXT_FROM = [".m4a", ".flac"]  # extensions to convert from
@@ -76,30 +77,65 @@ def run_tasks(tasks: List[threading.Thread], max_threads: int = 16):
         running_threads = []
 
 
-def convert_all_in_folder(folder_to_convert: Path, output_folder: Path):
-    # resolve, convert to string
-    output_folder = str(Path(output_folder).resolve())
+def check_to_copy_or_convert_file(file_path: Path, output_folder: Path):
     all_copy_tasks = []
     all_convert_tasks = []
-    for root, dirs, files in os.walk(folder_to_convert):
-        # add relative path of subfolder
-        output_folder += str(Path(root)).replace(str(folder_to_convert), "")
-        for file in files:
-            file_path = Path(file)
-            song_name = file_path.stem
-            output_file = f"{output_folder}\\{song_name}{EXT}"
-            input_file = str(Path(Path(root) / f"{song_name}{file_path.suffix}").resolve())
-            if file_path.suffix in EXT_FROM and file_path.suffix != EXT:
-                all_convert_tasks.append(threading.Thread(target=convert_file, args=(input_file, output_folder, output_file,)))
-            elif file_path.suffix == EXT:
-                output_file = str(Path(output_file).resolve())
-                all_copy_tasks.append(threading.Thread(target=copy_file, args=(input_file, output_folder, output_file,)))
+    song_name = file_path.stem
+    output_file = f"{output_folder}\\{song_name}{EXT}"
+    input_file = file_path
+    if file_path.suffix in EXT_FROM and file_path.suffix != EXT:
+        all_convert_tasks.append(threading.Thread(target=convert_file, args=(input_file, output_folder, output_file,)))
+    elif file_path.suffix == EXT:
+        input_file = str(input_file)
+        output_file = str(Path(output_file).resolve())
+        all_copy_tasks.append(threading.Thread(target=copy_file, args=(input_file, output_folder, output_file,)))
+    return {
+        "all_copy_tasks": all_copy_tasks,
+        "all_convert_tasks": all_convert_tasks
+    }
+
+
+def convert_all_in_folder(folder_to_convert: Path, output_folder: Path, paths_file: Path = None):
+    # resolve, convert to string
+    all_copy_tasks = []
+    all_convert_tasks = []
+    if paths_file:
+        with open(paths_file.resolve()) as file:
+            lines = file.readlines()
+            lines = [line.rstrip() for line in lines]
+        for line in lines:
+            file_path = Path(line)
+            new_output_folder = str(Path(output_folder).resolve())
+            # get parent subfolder
+            new_output_folder += str(file_path.parent).replace(str(folder_to_convert), "")
+            check_copy_convert = check_to_copy_or_convert_file(file_path, new_output_folder)
+            all_copy_tasks += check_copy_convert["all_copy_tasks"]
+            all_convert_tasks += check_copy_convert["all_convert_tasks"]
+
+    else:
+        for root, dirs, files in os.walk(folder_to_convert):
+            # get input file subdirectory
+            new_output_folder = str(Path(output_folder).resolve()) + str(Path(root)).replace(str(folder_to_convert), "")
+            for file in files:
+                file_path = Path(file)
+                song_name = file_path.stem
+                input_file = Path(Path(root) / f"{song_name}{file_path.suffix}").resolve()
+                check_copy_convert = check_to_copy_or_convert_file(input_file, new_output_folder)
+                all_copy_tasks += check_copy_convert["all_copy_tasks"]
+                all_convert_tasks += check_copy_convert["all_convert_tasks"]
+
     threading.Thread(target=run_tasks, args=(all_copy_tasks,)).start()
     threading.Thread(target=run_tasks, args=(all_convert_tasks,)).start()
 
 
 if __name__ == "__main__":
     enable_logging()
-    arg_input_folder = Path(sys.argv[1]).resolve()
-    arg_output_folder = Path(sys.argv[2]).resolve()
-    convert_all_in_folder(arg_input_folder, arg_output_folder)
+    arg_paths_file = None
+    if sys.argv[1] == "--file":
+        arg_paths_file = Path(sys.argv[2]).resolve()
+        arg_input_folder = Path(sys.argv[3]).resolve()
+        arg_output_folder = Path(sys.argv[4]).resolve()
+    else:
+        arg_input_folder = Path(sys.argv[1]).resolve()
+        arg_output_folder = Path(sys.argv[2]).resolve()
+    convert_all_in_folder(arg_input_folder, arg_output_folder, arg_paths_file)
