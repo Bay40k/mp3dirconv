@@ -39,7 +39,6 @@ def copy_file(input_file: str, output_folder: str, output_file: str):
         return None
     logger.info(f"Copying file '{input_file}' to '{output_file}'")
     shutil.copyfile(input_file, output_file)
-    time.sleep(5)
 
 
 def convert_file(input_file: str, output_folder: str, output_file: str):
