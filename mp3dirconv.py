@@ -14,7 +14,7 @@ mp3dirconv.py [options] <input folder> <output folder>
 --file <input file> | Use list of paths from a file, and uses input folder as root reference for output subfolders
 """
 
-EXT_FROM = [".m4a", ".flac"]  # extensions to convert from
+EXT_FROM = [".m4a", ".flac", ".wav"]  # extensions to convert from
 EXT = ".mp3"  # extension to convert to
 SAMPL_RATE = "44100"  # sample rate (kHz)
 BIT_RATE = "200"  # birate (kbps)
