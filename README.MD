@@ -4,5 +4,8 @@ Simple script for converting files of a given format, in a directory, to another
 
 ### Usage
 ```commandline
-python mp3dirconv.py <input folder> <output folder>
+python mp3dirconv.py [options] <input folder> <output folder>
+
+Options:
+--file <text document with list of file paths separated by newline>
 ```
