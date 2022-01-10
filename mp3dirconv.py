@@ -100,11 +100,11 @@ def convert_all_in_folder(folder_to_convert: Path, output_folder: Path, paths_fi
     all_copy_tasks = []
     all_convert_tasks = []
 
-    # copy directory structure
+    dirs_to_make = []
     for root, dirs, files in os.walk(folder_to_convert):
         for dirname in dirs:
-            dirpath = os.path.join(output_folder, root, dirname)
-            os.mkdir(dirpath)
+            dirpath = os.path.join(output_folder, dirname)
+            dirs_to_make.append(dirpath)
 
     if paths_file:
         with open(paths_file.resolve()) as file:
@@ -112,6 +112,10 @@ def convert_all_in_folder(folder_to_convert: Path, output_folder: Path, paths_fi
             lines = [line.rstrip() for line in lines]
         for line in lines:
             file_path = Path(line)
+            for dirpath in dirs_to_make:
+                if str(file_path.parent.stem) in dirpath:
+                    if not os.path.exists(dirpath):
+                        os.mkdir(dirpath)
             new_output_folder = str(Path(output_folder).resolve())
             # get parent subfolder
             new_output_folder += str(file_path.parent).replace(str(folder_to_convert), "")
@@ -120,6 +124,11 @@ def convert_all_in_folder(folder_to_convert: Path, output_folder: Path, paths_fi
             all_convert_tasks += check_copy_convert["all_convert_tasks"]
     else:
         for root, dirs, files in os.walk(folder_to_convert):
+            # copy directory structure
+            for dirpath in dirs_to_make:
+                if str(output_folder) in dirpath:
+                    if not os.path.exists(dirpath):
+                        os.mkdir(dirpath)
             # get input file subdirectory
             new_output_folder = str(Path(output_folder).resolve()) + str(Path(root)).replace(str(folder_to_convert), "")
             for file in files:
@@ -135,7 +144,7 @@ def convert_all_in_folder(folder_to_convert: Path, output_folder: Path, paths_fi
 
 
 if __name__ == "__main__":
-    enable_logging()
+    # enable_logging()
     arg_paths_file = None
     if sys.argv[1] == "--file":
         arg_paths_file = Path(sys.argv[2]).resolve()
