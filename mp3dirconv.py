@@ -3,7 +3,7 @@ import subprocess
 import sys
 import time
 from pathlib import Path
-from shutil import copyfile
+import shutil
 import threading
 from loguru import logger
 from typing import List, Optional
@@ -38,7 +38,7 @@ def copy_file(input_file: str, output_folder: str, output_file: str):
     if os.path.exists(output_file):
         return None
     logger.info(f"Copying file '{input_file}' to '{output_file}'")
-    copyfile(input_file, output_file)
+    shutil.copyfile(input_file, output_file)
     time.sleep(5)
 
 
@@ -104,11 +104,11 @@ def convert_all_in_folder(folder_to_convert: Path, output_folder: Path, paths_fi
             dirs_to_make.append(dirpath)
 
     if paths_file:
-        with open(paths_file.resolve()) as file:
+        with open(paths_file.resolve(), "rb") as file:
             lines = file.readlines()
             lines = [line.rstrip() for line in lines]
         for line in lines:
-            file_path = Path(line)
+            file_path = Path(line.decode("utf-8"))
             for dirpath in dirs_to_make:
                 if str(file_path.parent.stem) in dirpath:
                     if not os.path.exists(dirpath):
