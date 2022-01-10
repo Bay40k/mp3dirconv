@@ -99,6 +99,13 @@ def convert_all_in_folder(folder_to_convert: Path, output_folder: Path, paths_fi
     # resolve, convert to string
     all_copy_tasks = []
     all_convert_tasks = []
+
+    # copy directory structure
+    for root, dirs, files in os.walk(folder_to_convert):
+        for dirname in dirs:
+            dirpath = os.path.join(output_folder, root, dirname)
+            os.mkdir(dirpath)
+
     if paths_file:
         with open(paths_file.resolve()) as file:
             lines = file.readlines()
@@ -111,7 +118,6 @@ def convert_all_in_folder(folder_to_convert: Path, output_folder: Path, paths_fi
             check_copy_convert = check_to_copy_or_convert_file(file_path, new_output_folder)
             all_copy_tasks += check_copy_convert["all_copy_tasks"]
             all_convert_tasks += check_copy_convert["all_convert_tasks"]
-
     else:
         for root, dirs, files in os.walk(folder_to_convert):
             # get input file subdirectory
