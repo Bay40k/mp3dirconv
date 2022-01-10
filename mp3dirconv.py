@@ -35,18 +35,18 @@ def enable_logging(log_level: str = "INFO", log_format: Optional[str] = default_
 
 
 def copy_file(input_file: str, output_folder: str, output_file: str):
-    if os.path.exists(output_file):
-        return None
-    if not os.path.exists(output_folder):
-        os.mkdir(output_folder)
+    #if os.path.exists(output_file):
+    #    return None
+    #if not os.path.exists(output_folder):
+     #   os.mkdir(output_folder)
     logger.info(f"Copying file '{input_file}' to '{output_file}'")
     copyfile(input_file, output_file)
     time.sleep(5)
 
 
 def convert_file(input_file: str, output_folder: str, output_file: str):
-    if not os.path.exists(output_folder):
-        os.mkdir(output_folder)
+    #if not os.path.exists(output_folder):
+    #    os.mkdir(output_folder)
     # convert
     if not os.path.exists(output_file):
         logger.info(f"Converting file '{input_file}' to '{output_file}'\n")
@@ -103,7 +103,8 @@ def convert_all_in_folder(folder_to_convert: Path, output_folder: Path, paths_fi
     dirs_to_make = []
     for root, dirs, files in os.walk(folder_to_convert):
         for dirname in dirs:
-            dirpath = os.path.join(output_folder, dirname)
+            dirpath = os.path.join(root, dirname)
+            dirpath = str(Path(output_folder).resolve()) + dirpath.replace(str(folder_to_convert), "")
             dirs_to_make.append(dirpath)
 
     if paths_file:
@@ -115,7 +116,7 @@ def convert_all_in_folder(folder_to_convert: Path, output_folder: Path, paths_fi
             for dirpath in dirs_to_make:
                 if str(file_path.parent.stem) in dirpath:
                     if not os.path.exists(dirpath):
-                        os.mkdir(dirpath)
+                        os.makedirs(dirpath)
             new_output_folder = str(Path(output_folder).resolve())
             # get parent subfolder
             new_output_folder += str(file_path.parent).replace(str(folder_to_convert), "")
@@ -128,7 +129,7 @@ def convert_all_in_folder(folder_to_convert: Path, output_folder: Path, paths_fi
             for dirpath in dirs_to_make:
                 if str(output_folder) in dirpath:
                     if not os.path.exists(dirpath):
-                        os.mkdir(dirpath)
+                        os.makedirs(dirpath)
             # get input file subdirectory
             new_output_folder = str(Path(output_folder).resolve()) + str(Path(root)).replace(str(folder_to_convert), "")
             for file in files:
