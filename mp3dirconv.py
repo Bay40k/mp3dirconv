@@ -35,18 +35,14 @@ def enable_logging(log_level: str = "INFO", log_format: Optional[str] = default_
 
 
 def copy_file(input_file: str, output_folder: str, output_file: str):
-    #if os.path.exists(output_file):
-    #    return None
-    #if not os.path.exists(output_folder):
-     #   os.mkdir(output_folder)
+    if os.path.exists(output_file):
+        return None
     logger.info(f"Copying file '{input_file}' to '{output_file}'")
     copyfile(input_file, output_file)
     time.sleep(5)
 
 
 def convert_file(input_file: str, output_folder: str, output_file: str):
-    #if not os.path.exists(output_folder):
-    #    os.mkdir(output_folder)
     # convert
     if not os.path.exists(output_file):
         logger.info(f"Converting file '{input_file}' to '{output_file}'\n")
