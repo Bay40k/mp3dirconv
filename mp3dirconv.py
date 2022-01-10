@@ -144,7 +144,7 @@ def convert_all_in_folder(folder_to_convert: Path, output_folder: Path, paths_fi
 
 
 if __name__ == "__main__":
-    # enable_logging()
+    enable_logging()
     arg_paths_file = None
     if sys.argv[1] == "--file":
         arg_paths_file = Path(sys.argv[2]).resolve()
