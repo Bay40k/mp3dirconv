@@ -18,6 +18,7 @@ EXT_FROM = [".m4a", ".flac", ".wav"]  # extensions to convert from
 EXT = ".mp3"  # extension to convert to
 SAMPL_RATE = "44100"  # sample rate (kHz)
 BIT_RATE = "200"  # birate (kbps)
+MAX_THREADS_PER_TASK = 8  # maximum threads for convert and copy tasks
 
 logger.remove()
 default_log_format = "<g>{time:MM/DD/YYYY HH:mm:ss}</g> | <lvl>{level}</lvl> | <lvl><b>{message}</b></lvl>"
@@ -34,7 +35,7 @@ def enable_logging(log_level: str = "INFO", log_format: Optional[str] = default_
     logger.add(sys.stderr, format=log_format, level=log_level, colorize=True)
 
 
-def copy_file(input_file: str, output_folder: str, output_file: str):
+def copy_file(input_file: str, output_file: str):
     if os.path.exists(output_file):
         return None
     logger.info(f"Copying file '{input_file}' to '{output_file}'")
@@ -42,7 +43,7 @@ def copy_file(input_file: str, output_folder: str, output_file: str):
     time.sleep(5)
 
 
-def convert_file(input_file: str, output_folder: str, output_file: str):
+def convert_file(input_file: str, output_file: str):
     # convert
     if not os.path.exists(output_file):
         logger.info(f"Converting file '{input_file}' to '{output_file}'\n")
@@ -51,17 +52,11 @@ def convert_file(input_file: str, output_folder: str, output_file: str):
         subprocess.check_output(command, shell=True, stderr=subprocess.STDOUT)
 
 
-def run_tasks(tasks: List[threading.Thread], max_threads: int = 16):
-    tasks_to_run = []
+def run_tasks(tasks: List[threading.Thread], max_threads: int = MAX_THREADS_PER_TASK):
     running_threads = []
     amt_of_tasks = len(tasks)
     while amt_of_tasks > 0:
-        for i in range(0, max_threads):
-            try:
-                tasks_to_run.append(tasks[i])
-            except IndexError:
-                continue
-        for t in tasks_to_run:
+        for t in tasks[:max_threads]:
             t.start()
             running_threads.append(t)
             tasks.pop(tasks.index(t))
@@ -69,7 +64,6 @@ def run_tasks(tasks: List[threading.Thread], max_threads: int = 16):
         # wait for tasks to complete
         for t in running_threads:
             t.join()
-        tasks_to_run = []
         running_threads = []
 
 
@@ -80,11 +74,11 @@ def check_to_copy_or_convert_file(file_path: Path, output_folder: Path):
     output_file = f"{output_folder}\\{song_name}{EXT}"
     input_file = file_path
     if file_path.suffix in EXT_FROM and file_path.suffix != EXT:
-        all_convert_tasks.append(threading.Thread(target=convert_file, args=(input_file, output_folder, output_file,)))
+        all_convert_tasks.append(threading.Thread(target=convert_file, args=(input_file, output_file,)))
     elif file_path.suffix == EXT:
         input_file = str(input_file)
         output_file = str(Path(output_file).resolve())
-        all_copy_tasks.append(threading.Thread(target=copy_file, args=(input_file, output_folder, output_file,)))
+        all_copy_tasks.append(threading.Thread(target=copy_file, args=(input_file, output_file,)))
     return {
         "all_copy_tasks": all_copy_tasks,
         "all_convert_tasks": all_convert_tasks
