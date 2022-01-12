@@ -13,7 +13,8 @@ EXT_FROM = [".m4a", ".flac", ".wav"]  # extensions to convert from
 EXT = ".mp3"  # extension to convert to
 SAMPL_RATE = "44100"  # sample rate (kHz)
 BIT_RATE = "200"  # birate (kbps)
-MAX_THREADS_PER_TASK = 8  # maximum threads for convert and copy tasks
+MAX_THREADS = 16  # total max threads for any task
+MAX_THREADS_PER_TASK = int(MAX_THREADS / 2)  # maximum threads for convert and copy tasks
 
 logger.remove()
 default_log_format = "<g>{time:MM/DD/YYYY HH:mm:ss}</g> | <lvl>{level}</lvl> | <lvl><b>{message}</b></lvl>"
