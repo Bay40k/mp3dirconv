@@ -8,11 +8,6 @@ import threading
 from loguru import logger
 from typing import List, Optional
 
-"""
-Usage:
-mp3dirconv.py [options] <input folder> <output folder>
---file <input file> | Use list of paths from a file, and uses input folder as root reference for output subfolders
-"""
 
 EXT_FROM = [".m4a", ".flac", ".wav"]  # extensions to convert from
 EXT = ".mp3"  # extension to convert to
@@ -85,6 +80,11 @@ def check_to_copy_or_convert_file(file_path: Path, output_folder: Path):
 
 
 def convert_all_in_folder(folder_to_convert: Path, output_folder: Path, paths_file: Path = None):
+    """
+    Usage:
+    mp3dirconv.py [options] <input folder> <output folder>
+    --file <input file> | Use list of paths from a file, and uses input folder as root reference for output subfolders
+    """
     # resolve, convert to string
     all_copy_tasks = []
     all_convert_tasks = []
@@ -136,11 +136,14 @@ def convert_all_in_folder(folder_to_convert: Path, output_folder: Path, paths_fi
 if __name__ == "__main__":
     enable_logging()
     arg_paths_file = None
-    if sys.argv[1] == "--file":
-        arg_paths_file = Path(sys.argv[2]).resolve()
-        arg_input_folder = Path(sys.argv[3]).resolve()
-        arg_output_folder = Path(sys.argv[4]).resolve()
-    else:
-        arg_input_folder = Path(sys.argv[1]).resolve()
-        arg_output_folder = Path(sys.argv[2]).resolve()
-    convert_all_in_folder(arg_input_folder, arg_output_folder, arg_paths_file)
+    try:
+        if sys.argv[1] == "--file":
+            arg_paths_file = Path(sys.argv[2]).resolve()
+            arg_input_folder = Path(sys.argv[3]).resolve()
+            arg_output_folder = Path(sys.argv[4]).resolve()
+        else:
+            arg_input_folder = Path(sys.argv[1]).resolve()
+            arg_output_folder = Path(sys.argv[2]).resolve()
+        convert_all_in_folder(arg_input_folder, arg_output_folder, arg_paths_file)
+    except IndexError:
+        print(convert_all_in_folder.__doc__)
