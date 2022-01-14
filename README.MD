@@ -4,6 +4,8 @@ Simple script for converting files of a given format, in a directory, to another
 
 ### Usage
 ```commandline
+pip install loguru
+
 python mp3dirconv.py [options] <input folder> <output folder>
 
 Options:
