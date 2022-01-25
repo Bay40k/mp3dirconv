@@ -86,10 +86,8 @@ def convert_all_in_folder(folder_to_convert: Path, output_folder: Path, paths_fi
     mp3dirconv.py [options] <input folder> <output folder>
     --file <input file> | Use list of paths from a file, and uses input folder as root reference for output subfolders
     """
-    # resolve, convert to string
     all_copy_tasks = []
     all_convert_tasks = []
-
     dirs_to_make = []
     for root, dirs, files in os.walk(folder_to_convert):
         for dirname in dirs:
