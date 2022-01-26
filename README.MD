@@ -9,5 +9,5 @@ pip install loguru
 python mp3dirconv.py [options] <input folder> <output folder>
 
 Options:
---file <text document with list of file paths separated by newline>
+--file <an allow-list text document with list of file paths inside <input folder>, separated by newline>
 ```
