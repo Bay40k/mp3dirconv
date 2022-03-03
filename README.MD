@@ -1,6 +1,6 @@
 # mp3dirconv
 
-Simple script for converting files of a given format, in a directory, to another format (usually mp3). (Using ffmpeg)
+Simple script for converting (audio) files of a given format, in a directory, to another format (usually mp3). (Using ffmpeg)
 
 ### Usage
 ```commandline
