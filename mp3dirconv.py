@@ -113,9 +113,13 @@ def check_to_copy_or_convert_file(
 def process_files(
     folder_to_convert: Path, output_folder: Path, paths_file: Path = None
 ) -> Tuple[List[threading.Thread], List[threading.Thread]]:
+    """
+    Usage:
+    mp3dirconv.py [options] <input folder> <output folder>
+    --file <input file> | Use list of paths from a file, and uses input folder as root reference for output subfolders
+    """
     all_copy_tasks = []
     all_convert_tasks = []
-
     dirs_to_make = []
     for root, dirs, files in os.walk(folder_to_convert):
         for dirname in dirs:
